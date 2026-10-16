@@ -1,0 +1,11 @@
+{
+  "predicted": [
+    {"type": "ID Switch Candidate", "frame": 8, "track_id": 5},
+    {"type": "Gap Frame", "frame": 4, "track_id": 1}
+  ],
+  "ground_truth": [
+    {"type": "ID Switch Candidate", "frame": 8, "track_id": 5},
+    {"type": "Gap Frame", "frame": 4, "track_id": 1}
+  ],
+  "tolerance": 2
+}

@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+storage/*.jsonl
+.DS_Store
+
+storage/projects/
+storage/video_cache/
+storage/zip_cache/
+storage/audit/
+storage/users.json
+storage/sessions.json
+storage/groups.json
+storage/cvat_accounts.json
+storage/cvat_backups/

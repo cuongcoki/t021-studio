@@ -1,0 +1,76 @@
+flowchart TB
+  USER["Reviewer / Annotator"]
+  subgraph FE["1. WEB UI"]
+    UP[Upload MOT or CVAT / Saved Project]
+    VIEW[Media + Canvas + Timeline]
+    ISS[Issue Queue + Inspector]
+    REVIEW[Human decision + Undo/Redo]
+  end
+  subgraph API["2. API LAYER · server.py + backend/orchestrator.py"]
+    ROUTE[HTTP JSON API]
+    ORCH[QA Orchestrator]
+    FIX[Fix Manager + Conflict Check]
+    EXP[Export Service]
+    BENCH[Benchmark Service]
+  end
+  subgraph PROCESS["3. DATA PROCESSING"]
+    PARSE[Parser MOT / CVAT XML]
+    NORMAL[Normalize boxes]
+    STRUCT[Structural Validator]
+    MOTION[Common Motion Estimation]
+  end
+  subgraph DET["4. DETECTION ENGINE"]
+    GAP[Gap and Edge / Occlusion heuristic]
+    JUMP[Box Jump and Spike]
+    SW[ID Stitch / Swap Candidate]
+    DUP[Class / Bounds / Duplicate]
+    TRIAGE[Issue Scoring / Triage]
+  end
+  subgraph HUMAN["5. HUMAN-IN-THE-LOOP"]
+    DECIDE{Reviewer Decision}
+    SAFE[Approve fix]
+    IGNORE[False Positive]
+    MANUAL[Edit box manually]
+    GATE[Revalidate / Quality Gate]
+  end
+  subgraph STORAGE["6. LOCAL STORAGE AND OUTPUT"]
+    IN[(Input files / local media)]
+    OUT[(MOT / CVAT XML / JSON)]
+    AUDIT[(Audit JSONL)]
+    REPORT[(QA report / metrics)]
+    PROJECT[(Portable T021 project)]
+  end
+  USER <--> FE
+  UP --> ROUTE
+  VIEW --> ISS
+  ROUTE --> ORCH
+  ORCH --> PARSE --> NORMAL --> STRUCT
+  NORMAL --> MOTION
+  NORMAL --> GAP
+  MOTION --> JUMP
+  NORMAL --> SW
+  STRUCT --> DUP
+  GAP --> TRIAGE
+  JUMP --> TRIAGE
+  SW --> TRIAGE
+  DUP --> TRIAGE
+  TRIAGE --> ISS --> DECIDE
+  DECIDE --> SAFE & IGNORE & MANUAL
+  SAFE --> FIX --> GATE
+  IGNORE --> GATE
+  MANUAL --> FIX
+  GATE --> ORCH
+  GATE --> EXP --> OUT
+  DECIDE --> AUDIT
+  BENCH --> REPORT
+  ORCH --> BENCH
+  UP --> PROJECT
+  IN --> PARSE
+  classDef ui fill:#e9f1ff,stroke:#4475e8,color:#173b89
+  classDef detect fill:#fff1dd,stroke:#ed9c3b,color:#8a470c
+  classDef validate fill:#e4f8e8,stroke:#2c9e65,color:#145335
+  classDef human fill:#f4eaff,stroke:#9361d2,color:#58258d
+  class UP,VIEW,ISS,REVIEW ui
+  class GAP,JUMP,SW,DUP,TRIAGE detect
+  class PARSE,NORMAL,STRUCT,MOTION validate
+  class DECIDE,SAFE,IGNORE,MANUAL,GATE human
